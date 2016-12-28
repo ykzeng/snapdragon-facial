@@ -8,7 +8,10 @@
 
 package com.qualcomm.snapdragon.sdk.sample;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.EnumSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -26,9 +29,13 @@ import android.hardware.Camera.FaceDetectionListener;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.hardware.SensorManager;
+import android.net.LocalSocket;
+import android.net.LocalSocketAddress;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -50,9 +57,46 @@ import com.qualcomm.snapdragon.sdk.face.FacialProcessing.PREVIEW_ROTATION_ANGLE;
 
 @SuppressLint("NewApi")
 public class CameraPreviewActivity extends Activity implements Camera.PreviewCallback {
+    // yukun
+    // Variables for mobi storm
+    // Info needed for topology submitter
+    public static String MASTER_NODE = "10.0.0.2";  // should get from the input
+    public static String CLUSTER_ID = "xxxx";   // should get from the input
+    public static final String apkFileDirectory = "/storage/emulated/0/Upload";
+    public static final String apkFileName = "app-debug.apk";
+    // need to fill in the cqueue
+    private ConcurrentLinkedQueue<byte[]> cqueue= new ConcurrentLinkedQueue<byte[]>();
+    private LocalSocket localClient;
+    private OutputStream os;
+    private static final String LOCAL_ADDRESS = "com.android.greporter";
+    public static String localAddress;
+
+    // write data into com.android.greporter
+    public class StreamThreadLocal implements Runnable {
+        public void run() {
+            localClient = new LocalSocket();
+            try {
+                localClient.connect(new LocalSocketAddress(LOCAL_ADDRESS));
+                os=localClient.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            while(!Thread.currentThread().isInterrupted()){
+                byte[] data=cqueue.poll();
+                if(data!=null){
+                    try {
+                        os.write(data);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+    // yukun end
 
     // Global Variables Required
-
     Camera cameraObj;
     FrameLayout preview;
     FacialProcessing faceProc;
@@ -65,6 +109,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     private final int FRONT_CAMERA_INDEX = 1;
     private final int BACK_CAMERA_INDEX = 0;
     private int MY_PERMISSIONS_REQUEST_CAMERA = -1;
+    private int MY_PERMISSIONS_REQUEST_WIFI = -1;
 
     // boolean clicked = false;
     boolean fpFeatureSupported = false;
@@ -102,6 +147,11 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWifiPermissions();
+        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+        localAddress= Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+
         setContentView(R.layout.activity_camera_preview);
         myView = new View(CameraPreviewActivity.this);
         // Create our Preview view and set it as the content of our activity.
@@ -160,14 +210,30 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
+        // yukun
+        // start the stream thread to poll cqueue data and write to output stream
+        new Thread(new StreamThreadLocal()).start();
     }
 
+    // yukun
     public void requestCameraPermissions(){
         int permissionFlag = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (permissionFlag != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
         }
     }
+
+    public void requestWifiPermissions(){
+        int permissionFlag = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE);
+        if (permissionFlag != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE}, MY_PERMISSIONS_REQUEST_WIFI);
+        }
+    }
+
+    public static String getLocalAddress(){
+        return localAddress;
+    }
+    // yukun end
 
     FaceDetectionListener faceDetectionListener = new FaceDetectionListener() {
 
@@ -429,6 +495,9 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
             break;
         }
 
+        // yukun
+        // from here, distribute the data to other devices and do face processing
+        cqueue.add(data);
         if (faceProc == null) {
             faceProc = FacialProcessing.getInstance();
         }
@@ -440,7 +509,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         // Landscape mode - front camera
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
             cameraObj.setDisplayOrientation(displayAngle);
             landScapeMode = true;
         }
@@ -454,7 +523,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         // Portrait mode - front camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 && !cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
             cameraObj.setDisplayOrientation(displayAngle);
             landScapeMode = false;
         }
