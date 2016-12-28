@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/* ======================================================================
+*  Copyright (c) 2014 Qualcomm Technologies, Inc. All Rights Reserved.
+*  QTI Proprietary and Confidential.
+*  =====================================================================
+* @file    AndroidManifest.xml
+* @brief   Android application manifest file for DeviceInfo API.
+*/
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.qualcomm.snapdragon.sdk.sample"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="17" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.front" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:configChanges="orientation"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+        <!--<activity-->
+        <!--android:name="com.qualcomm.snapdragon.sdk.sample.CameraPreviewActivity"-->
+        <!--android:label="@string/app_name" >-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.MAIN" />-->
+
+        <!--<category android:name="android.intent.category.LAUNCHER" />-->
+        <!--</intent-filter>-->
+        <!--</activity>-->
+        <activity
+            android:name="com.qualcomm.snapdragon.MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.sample.CameraPreviewActivity"
+            android:label="@string/app_name" >
+        </activity>
+
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.recognition.sample.FacialRecognitionActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.recognition.sample.AddPhoto"
+            android:label="@string/title_activity_add_photo"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.recognition.sample.ImageConfirmation"
+            android:label="@string/title_activity_image_confirmation" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.recognition.sample.ChooseUser"
+            android:label="@string/title_activity_choose_user" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.recognition.sample.LiveRecognition"
+            android:label="@string/title_activity_live_recognition"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.snapdragon.sdk.sample.GalleryProcessing"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.sdk.smartshutterapp.SmartShutterActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.qualcomm.sdk.smartshutterapp.ImageConfirmation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+    </application>
+
+</manifest>
