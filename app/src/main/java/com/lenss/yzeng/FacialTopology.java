@@ -18,7 +18,7 @@ public class FacialTopology {
         csd.setSourceIP(CameraPreviewActivity.getLocalAddress());
         mTopology.setDistributor(csd, 1);
 
-        FaceDetector fd = new FaceDetector();
+        FaceDetectionProcessor fd = new FaceDetectionProcessor();
         fd.setSourceIP(CameraPreviewActivity.getLocalAddress());
         mTopology.setProcessor(fd, 2, Topology.Local_First);
 

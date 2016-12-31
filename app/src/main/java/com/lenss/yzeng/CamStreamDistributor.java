@@ -24,6 +24,7 @@ public class CamStreamDistributor extends Distributor {
 
     public void execute(){
         // whether we still needs to find GoP here?
+        // TODO 1st, we ignore GoP and do one frame at a time
         byte[] frames = new byte[BUF_SIZE];
         int datalen = 0;
         int rem_pics = 0;
@@ -60,7 +61,7 @@ public class CamStreamDistributor extends Distributor {
                                     System.arraycopy(frames, last_start, gop, 0, i - last_start);
                                     last_start = i;
                                     try {
-                                        String component = FaceDetector.class.getName();
+                                        String component = FaceDetectionProcessor.class.getName();
                                         if(gop!=null) {
                                             ComputingNode.emit(gop, getTaskID(), component);
                                         }

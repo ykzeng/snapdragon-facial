@@ -10,13 +10,17 @@ package com.qualcomm.snapdragon.sdk.sample;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
@@ -34,6 +38,7 @@ import android.net.LocalSocketAddress;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -50,6 +55,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lenss.yzeng.utils.FaceDetectionWrapper;
+import com.lenss.yzeng.utils.FaceDetector;
 import com.qualcomm.snapdragon.sdk.face.FaceData;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing.FP_MODES;
@@ -70,6 +77,8 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     private OutputStream os;
     private static final String LOCAL_ADDRESS = "com.android.greporter";
     public static String localAddress;
+    private static int dataLength;
+    private int previewTimes = 0;
 
     // write data into com.android.greporter
     public class StreamThreadLocal implements Runnable {
@@ -99,8 +108,11 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     // Global Variables Required
     Camera cameraObj;
     FrameLayout preview;
+
+    FaceData[] faceArray;
+    // yukun wrapper class for face detection
     FacialProcessing faceProc;
-    FaceData[] faceArray = null;// Array in which all the face data values will be returned for each face detected.
+    FaceDetector faceDetector = null;
     View myView;
     Canvas canvas = new Canvas();
     Paint rectBrush = new Paint();
@@ -175,6 +187,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
             Log.e("TAG", "Feature is supported");
             faceProc = FacialProcessing.getInstance();  // Calling the Facial Processing Constructor.
             faceProc.setProcessingMode(FP_MODES.FP_MODE_VIDEO);
+            faceDetector = new FaceDetector(faceProc);
         } else {
             Log.e("TAG", "Feature is NOT supported");
             return;
@@ -212,7 +225,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         // yukun
         // start the stream thread to poll cqueue data and write to output stream
-        new Thread(new StreamThreadLocal()).start();
+        // new Thread(new StreamThreadLocal()).start();
     }
 
     // yukun
@@ -469,6 +482,32 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
      */
     @Override
     public void onPreviewFrame(byte[] data, Camera arg1) {
+        // yukun: test if byte data can be all zero
+        // tests show that there might be some pictures in which bytes of zero exist
+//        ArrayList<Integer> zeroByteIndex = new ArrayList<Integer>();
+//        try{
+//            for (int i = 0; i < data.length; i++){
+//                if (data[i] == 0){
+//                    zeroByteIndex.add(i);
+//                    throw new Exception("Got all zero frame data!");
+//                }
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+        // test if the data array is of fixed length
+        // tests show that the data array is fixed to be
+//        try{
+//            if (previewTimes == 0)
+//                dataLength = data.length;
+//            else{
+//                if (dataLength != data.length)
+//                    throw new Exception("==============inconsistent preview frame data length!!!");
+//            }
+//            previewTimes ++;
+//        }catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         presentOrientation = (90 * Math.round(deviceOrientation / 90)) % 360;
         int dRotation = display.getRotation();
@@ -497,9 +536,11 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         // yukun
         // from here, distribute the data to other devices and do face processing
-        cqueue.add(data);
+        // cqueue.add(data);
+
         if (faceProc == null) {
             faceProc = FacialProcessing.getInstance();
+            faceDetector = new FaceDetector(faceProc);
         }
 
         Parameters params = cameraObj.getParameters();
@@ -507,34 +548,47 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         surfaceWidth = mPreview.getWidth();
         surfaceHeight = mPreview.getHeight();
 
+        boolean isMirrored = false;
         // Landscape mode - front camera
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            //faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+            //cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = true;
             landScapeMode = true;
         }
         // landscape mode - back camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            //faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
+            //cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = false;
             landScapeMode = true;
         }
         // Portrait mode - front camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 && !cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            //faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+            //cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = true;
             landScapeMode = false;
         }
         // Portrait mode - back camera
         else {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            //faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
+            //cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = false;
             landScapeMode = false;
         }
 
-        int numFaces = faceProc.getNumFaces();
+        // yukun: simplified version of the above commented code
+
+        cameraObj.setDisplayOrientation(displayAngle);
+
+        // from here the commented codes are original (unwrapped) for face detection
+        FaceDetectionWrapper faceWrapper = faceDetector.detectFaces(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
+
+          // original code
+        int numFaces = faceWrapper.getNumFaces();
 
         if (numFaces == 0) {
             Log.d("TAG", "No Face Detected");
@@ -549,10 +603,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         } else {
 
             Log.d("TAG", "Face Detected");
-            faceArray = faceProc.getFaceData(EnumSet.of(FacialProcessing.FP_DATA.FACE_RECT,
-                    FacialProcessing.FP_DATA.FACE_COORDINATES, FacialProcessing.FP_DATA.FACE_CONTOUR,
-                    FacialProcessing.FP_DATA.FACE_SMILE, FacialProcessing.FP_DATA.FACE_ORIENTATION,
-                    FacialProcessing.FP_DATA.FACE_BLINK, FacialProcessing.FP_DATA.FACE_GAZE));
+            faceArray = faceWrapper.getFaceArray();
             // faceArray = faceProc.getFaceData(); // Calling getFaceData() alone will give you all facial data except the
             // face
             // contour. Face Contour might be a heavy operation, it is recommended that you use it only when you need it.
@@ -565,7 +616,8 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
                     Log.e(TAG, "Eye Object not NULL");
                 }
 
-                faceProc.normalizeCoordinates(surfaceWidth, surfaceHeight);
+                // yukun: is this useful?
+                //faceProc.normalizeCoordinates(surfaceWidth, surfaceHeight);
                 preview.removeView(drawView);// Remove the previously created view to avoid unnecessary stacking of Views.
                 drawView = new DrawView(this, faceArray, true, surfaceWidth, surfaceHeight, cameraObj, landScapeMode);
                 preview.addView(drawView);

@@ -21,6 +21,42 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-24.2.1_9650a4eaebff8511c76634a241c5d9ca735492cb\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-24.2.1_5d80278655121767378344c27f8b96bc1a034098\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-24.2.1_c50ee867ce6ab7632c81e9c45fb77439dd0ae681\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_f1e3e3b288be961c1706999eb3f55eae2c0d903d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
         jumboMode="true"
         optimize="true"
@@ -39,6 +75,24 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\libs\sd-sdk-facial-processing.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="18b675f7e2b5895521c475cded91414e2bfbe047">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\2\sd-sdk-facial-processing_78446b98a4261e7a755bdfadf08ce118e42bd970\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_feb33fe405ffe023921074beacb248cc1ce4221b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -48,12 +102,21 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\libs\mStorm.jar"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="a0380bf8cbe52607b99a167ab184d81889887de0">
-        <dex dex="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\transforms\dex\debug\folders\1000\2\mStorm_7cf41080c3a54fd2f3bb0f125d0c0a9a6fd34641\classes.dex" />
+        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-24.2.1_8d2a9c07a5d327fddb96ca3b421813cfa3b56753\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="a4c3e744c51da7492a9a5d60718a4a1c369bd464">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_8f7d9f3aa5cd45bfa541d632ba67e725c1fd0308\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -63,6 +126,15 @@
         revision="24.0.3"
         sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
         <dex dex="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-24.2.1_81fa9c725db356f311b2cd2000f718b7db4052db\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-24.2.1_b023c48601816610b612cdc64ecb5649e9224340\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -102,6 +174,15 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\libs\mStorm.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="94023893c6b7490025c61bb45fec0c646e0956c2">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\2\mStorm_02879d7c15358a652d9c428976aa4c1d37983a5f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\libs\internal_impl-24.2.1.jar"
         jumboMode="true"
         optimize="true"
@@ -117,6 +198,15 @@
         revision="24.0.3"
         sha1="18b675f7e2b5895521c475cded91414e2bfbe047">
         <dex dex="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\transforms\dex\debug\folders\1000\2\sd-sdk-facial-processing_2efa8c76ed2c02c50c86a115a53e7606b12698ae\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-vector-drawable-24.2.1_30bc4336c403eb20918ae2cf2e261fa293f12280\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -147,12 +237,39 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="8d69e80c5525be8a6f54388ebae912eb5370da7a">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_3587793f74c52de416bda47416ff1de47c487ff9\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
         sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
         <dex dex="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-24.2.1_77e62952ef077ea964afea63edb1a48fc7a71bc8\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_126439d53005d63645e8d30195ce8aa8f299fbe0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-24.2.1_18341d23b1f297ce45a6bb5261cf18a32da09a9a\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -165,12 +282,48 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="935a969265b2a166b2d20415423f5f6e90fe16e0">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_313857bf90519ea7adaa5754c1a6bb7398ac7e27\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-24.2.1_cb308a6d35b7aabdae9f0cbd05c6b5b06860986d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
         sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
         <dex dex="C:\Users\yukun\workspace\lenss\SnapdragonFacialSamples\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-24.2.1_c6cf6545609ac988d30a9eb305aa2f3eb89f1e76\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-24.2.1_44529c1c90df8eb61f4e9a53f5cd99d29a15e32b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="867dad63c33388ff8c7644b236579355036d075f">
+        <dex dex="C:\Users\yukun\workspace\snapdragon-facial\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_c43997bbeb1f1d96cfcfc65103d55994a4120cc6\classes.dex" />
     </item>
 
 </items>
