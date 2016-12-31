@@ -43,6 +43,29 @@ public class FaceDetector {
         return new FaceDetectionWrapper(faceArray, numFaces);
     }
 
+    public FaceDetectionWrapper detectFaces(FrameData frameData) {
+        FaceData[] faceArray = null;
+        byte[] data = frameData.getData();
+        int previewSizeWidth = frameData.getPreviewSizeWidth(), previewSizeHeight = frameData.getPreviewSizeHeight();
+        boolean isMirrored = frameData.isMirrored();
+        FacialProcessing.PREVIEW_ROTATION_ANGLE angleEnum = frameData.getAngleEnum();
+        int surfaceWidth = frameData.getSurfaceWidth(), surfaceHeight = frameData.getSurfaceHeight();
+
+        faceProc.setFrame(data, previewSizeWidth, previewSizeHeight, isMirrored, angleEnum);
+
+        int numFaces = faceProc.getNumFaces();
+
+        if (numFaces != 0){
+            Log.d(TAG, "Face Detected");
+            faceArray = faceProc.getFaceData(EnumSet.of(FacialProcessing.FP_DATA.FACE_RECT,
+                    FacialProcessing.FP_DATA.FACE_COORDINATES, FacialProcessing.FP_DATA.FACE_CONTOUR,
+                    FacialProcessing.FP_DATA.FACE_SMILE, FacialProcessing.FP_DATA.FACE_ORIENTATION,
+                    FacialProcessing.FP_DATA.FACE_BLINK, FacialProcessing.FP_DATA.FACE_GAZE));
+            faceProc.normalizeCoordinates(surfaceWidth, surfaceHeight);
+        }
+        return new FaceDetectionWrapper(faceArray, numFaces);
+    }
+
     public static class FrameData{
         private byte[] data;
         private int previewSizeWidth;

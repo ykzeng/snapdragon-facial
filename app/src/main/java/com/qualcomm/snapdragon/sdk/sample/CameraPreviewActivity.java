@@ -9,6 +9,7 @@
 package com.qualcomm.snapdragon.sdk.sample;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -72,9 +73,9 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     public static final String apkFileDirectory = "/storage/emulated/0/Upload";
     public static final String apkFileName = "app-debug.apk";
     // need to fill in the cqueue
-    private ConcurrentLinkedQueue<byte[]> cqueue= new ConcurrentLinkedQueue<byte[]>();
+    private ConcurrentLinkedQueue<FaceDetector.FrameData> cqueue= new ConcurrentLinkedQueue<FaceDetector.FrameData>();
     private LocalSocket localClient;
-    private OutputStream os;
+    private ObjectOutputStream oos;
     private static final String LOCAL_ADDRESS = "com.android.greporter";
     public static String localAddress;
     private static int dataLength;
@@ -86,16 +87,16 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
             localClient = new LocalSocket();
             try {
                 localClient.connect(new LocalSocketAddress(LOCAL_ADDRESS));
-                os=localClient.getOutputStream();
+                oos = new ObjectOutputStream(localClient.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             while(!Thread.currentThread().isInterrupted()){
-                byte[] data=cqueue.poll();
+                FaceDetector.FrameData data=cqueue.poll();
                 if(data!=null){
                     try {
-                        os.write(data);
+                        oos.writeObject(data);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -225,7 +226,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         // yukun
         // start the stream thread to poll cqueue data and write to output stream
-        // new Thread(new StreamThreadLocal()).start();
+        new Thread(new StreamThreadLocal()).start();
     }
 
     // yukun
@@ -534,10 +535,6 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
             break;
         }
 
-        // yukun
-        // from here, distribute the data to other devices and do face processing
-        // cqueue.add(data);
-
         if (faceProc == null) {
             faceProc = FacialProcessing.getInstance();
             faceDetector = new FaceDetector(faceProc);
@@ -551,43 +548,38 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         boolean isMirrored = false;
         // Landscape mode - front camera
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !cameraSwitch) {
-            //faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
-            //cameraObj.setDisplayOrientation(displayAngle);
             isMirrored = true;
             landScapeMode = true;
         }
         // landscape mode - back camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && cameraSwitch) {
-            //faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            //cameraObj.setDisplayOrientation(displayAngle);
             isMirrored = false;
             landScapeMode = true;
         }
         // Portrait mode - front camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 && !cameraSwitch) {
-            //faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
-            //cameraObj.setDisplayOrientation(displayAngle);
             isMirrored = true;
             landScapeMode = false;
         }
         // Portrait mode - back camera
         else {
-            //faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            //cameraObj.setDisplayOrientation(displayAngle);
             isMirrored = false;
             landScapeMode = false;
         }
-
-        // yukun: simplified version of the above commented code
-
         cameraObj.setDisplayOrientation(displayAngle);
 
-        // from here the commented codes are original (unwrapped) for face detection
-        FaceDetectionWrapper faceWrapper = faceDetector.detectFaces(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
+        // wrap up the frame data needed for a face detection
+        FaceDetector.FrameData frameData = new FaceDetector.FrameData(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
+        // yukun
+        // from here, distribute the data to other devices and do face processing
+        cqueue.add(frameData);
 
-          // original code
+        // from here the commented codes are original (unwrapped) for face detection
+        FaceDetectionWrapper faceWrapper = faceDetector.detectFaces(frameData);
+
+        // draw faces on the screen
         int numFaces = faceWrapper.getNumFaces();
 
         if (numFaces == 0) {
