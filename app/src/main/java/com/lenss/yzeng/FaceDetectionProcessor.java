@@ -4,8 +4,12 @@ import android.util.Log;
 
 import com.lenss.qning.greporter.greporter.core.ComputingNode;
 import com.lenss.qning.greporter.topology.Processor;
+import com.lenss.yzeng.utils.FaceDetectionWrapper;
+import com.lenss.yzeng.utils.FaceDetector;
+import com.lenss.yzeng.utils.Serializer;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -16,10 +20,10 @@ import java.util.ArrayList;
 public class FaceDetectionProcessor extends Processor {
     private static boolean isFaceObjExist = false;
     private boolean fpFeatureSupported = false;
-    private FacialProcessing faceProc = null;
+    private FaceDetector faceDetector = null;
     public final int confidence_value = 58;
     // the frame data length of a frame from onPreviewFrame()
-    public final int frameLength = 1474560;
+    //public final int frameLength = 1474560;
 
     private void setupFaceProc(){
         if (!isFaceObjExist) {
@@ -28,12 +32,13 @@ public class FaceDetectionProcessor extends Processor {
                     .isFeatureSupported(FacialProcessing.FEATURE_LIST.FEATURE_FACIAL_PROCESSING);
 
             // I think we don't have to check faceProc again here
-            if (fpFeatureSupported && faceProc == null) {
+            if (fpFeatureSupported && faceDetector == null) {
                 Log.e("TAG", "Feature is supported");
-                faceProc = FacialProcessing.getInstance();  // Calling the Facial Processing Constructor.
+                FacialProcessing faceProc = FacialProcessing.getInstance();  // Calling the Facial Processing Constructor.
                 faceProc.setRecognitionConfidence(confidence_value);
                 // we might wanna change the mode to FP_MODE_STILL to increase computing demand
                 faceProc.setProcessingMode(FacialProcessing.FP_MODES.FP_MODE_VIDEO);
+                faceDetector = new FaceDetector(faceProc);
             } else {
                 Log.e("TAG", "Feature is NOT supported");
                 return;
@@ -47,11 +52,19 @@ public class FaceDetectionProcessor extends Processor {
 
     public void execute(){
         byte[] data = null;
+        FaceDetector.FrameData frameData = null;
         // we assume that getData will get one data passed by emit() at a time
         // which shall be one frame data in onPreviewFrame(), then we can do face detection using that data
         while (!Thread.interrupted()){
             data = getData(getTaskID());
-
+            try {
+                frameData = (FaceDetector.FrameData) Serializer.deserialize(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData);
         }
         // yukun: simplified version of the above commented code
 //        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)

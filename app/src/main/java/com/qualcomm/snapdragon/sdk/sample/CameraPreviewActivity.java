@@ -8,10 +8,13 @@
 
 package com.qualcomm.snapdragon.sdk.sample;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -38,6 +41,7 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
@@ -58,6 +62,7 @@ import android.widget.TextView;
 
 import com.lenss.yzeng.utils.FaceDetectionWrapper;
 import com.lenss.yzeng.utils.FaceDetector;
+import com.lenss.yzeng.utils.Serializer;
 import com.qualcomm.snapdragon.sdk.face.FaceData;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing.FP_MODES;
@@ -93,10 +98,10 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
             }
 
             while(!Thread.currentThread().isInterrupted()){
-                FaceDetector.FrameData data=cqueue.poll();
-                if(data!=null){
+                FaceDetector.FrameData frameData=cqueue.poll();
+                if(frameData != null){
                     try {
-                        oos.writeObject(data);
+                        oos.writeObject(frameData);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -631,4 +636,68 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         }
     }
 
+    // TODO get the face detection feedback from downstream components
+    // The Server class is for receiving the feedback (face count from downstream components)
+//    class Server implements Runnable {
+//        private ServerSocket serverSocket;
+//        private Socket clientSocket;
+//
+//        public void run() {
+//            try {
+//                serverSocket = new ServerSocket(CameraCaptureActivity.FACE_NUM_SOCKET);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            while(!Thread.currentThread().isInterrupted()) {
+//                try {
+//                    clientSocket = serverSocket.accept();
+//                    logOutputStream.writeChars('\n'+ "Connectted to " +clientSocket.getRemoteSocketAddress().toString());
+//                    new Thread(new UpdateThread(clientSocket, mHandler)).start();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//        }
+//    }
+//
+//    // thread for retrieving face count from client socket
+//    class UpdateThread implements Runnable {
+//        Socket client;
+//        private DataInputStream input;
+//        private Handler mHandler;
+//        public UpdateThread(Socket client,Handler mHandler){
+//            this.client=client;
+//            this.mHandler=mHandler;
+//            try {
+//                this.input=new DataInputStream(client.getInputStream());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        @Override
+//        public void run() {
+//            while (!Thread.currentThread().isInterrupted()) {
+//
+//                try {
+//                    //int dataReaded = input.read(buf);
+//                    if(input.available()>0) {
+//                        int face = input.readInt();
+//                        logOutputStream.writeChars('\n' + face + " face/faces is detected! ");
+//                        mHandler.obtainMessage(CameraCaptureActivity.NUM_OF_FACES, face + " faces are detected! ").sendToTarget();
+///*                        try {
+//                            Thread.sleep(300);
+//                            mHandler.obtainMessage(CameraCaptureActivity.NUM_OF_FACES, 0 + " faces are detected! ").sendToTarget();
+//
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }*/
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        }
+//    }
 }

@@ -7,6 +7,7 @@ import com.qualcomm.snapdragon.sdk.face.FaceData;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 import com.qualcomm.snapdragon.sdk.sample.DrawView;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 
 /**
@@ -66,7 +67,7 @@ public class FaceDetector {
         return new FaceDetectionWrapper(faceArray, numFaces);
     }
 
-    public static class FrameData{
+    public static class FrameData implements Serializable{
         private byte[] data;
         private int previewSizeWidth;
         private int previewSizeHeight;
