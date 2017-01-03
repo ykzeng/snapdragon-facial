@@ -18,5 +18,7 @@
     <string name="selectText">Choose from Gallery</string>
     <string name="desc">Description</string>
 
-
+    <string name="action_set_masterIP">Set MasterIP</string>
+    <string name="action_set_clusterId">Set ClusterId</string>
+    <string name="action_submit_topology">Submit Topology</string>
 </resources>

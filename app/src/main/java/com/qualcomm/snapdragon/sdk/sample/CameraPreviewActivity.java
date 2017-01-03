@@ -235,6 +235,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     }
 
     // yukun
+
     public void requestCameraPermissions(){
         int permissionFlag = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (permissionFlag != PackageManager.PERMISSION_GRANTED){
