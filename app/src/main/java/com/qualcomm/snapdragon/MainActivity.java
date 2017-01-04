@@ -1,10 +1,13 @@
 package com.qualcomm.snapdragon;
 
-import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 import com.lenss.qning.greporter.topology.Topology;
 import com.lenss.qning.greporter.topology.mStormSubmitter;
 import com.lenss.yzeng.FacialTopology;
+import com.lenss.yzeng.utils.Utils;
 import com.qualcomm.sdk.smartshutterapp.SmartShutterActivity;
 import com.qualcomm.snapdragon.sdk.recognition.sample.FacialRecognitionActivity;
 import com.qualcomm.snapdragon.sdk.sample.CameraPreviewActivity;
@@ -26,18 +30,24 @@ import com.qualcomm.snapdragon.sdk.sample.R;
  * Created by yukun on 12/1/2016.
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
     public final static String EXTRA_MSG = "com.qualcomm.snapdragon.sdk.sample.MainActivity";
     public static String MASTER_NODE = "10.0.0.9";
     public static String CLUSTER_ID = "1111";
     public static final String apkFileDirectory = "/storage/emulated/0/Upload";
     private mStormSubmitter submitter;
     public static final String apkFileName = "app-debug.apk";
+    public static String localAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        Utils.requestPermisssions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE});
+
+        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+        localAddress= Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
 
         Button facialProcBtn = (Button) this.findViewById(R.id.button_processing);
         facialProcBtn.setOnClickListener(new View.OnClickListener() {
@@ -144,7 +154,7 @@ public class MainActivity extends Activity {
         } else {
             if((!CLUSTER_ID.equals("xxxx"))) {
                 Topology topology = FacialTopology.createTopology();
-                submitter = new mStormSubmitter(this,MASTER_NODE, CameraPreviewActivity.getLocalAddress(),CLUSTER_ID, apkFileDirectory);
+                submitter = new mStormSubmitter(this,MASTER_NODE, MainActivity.getLocalAddress(),CLUSTER_ID, apkFileDirectory);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -157,5 +167,9 @@ public class MainActivity extends Activity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static String getLocalAddress(){
+        return localAddress;
     }
 }

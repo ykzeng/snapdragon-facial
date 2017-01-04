@@ -63,6 +63,7 @@ import android.widget.TextView;
 import com.lenss.yzeng.utils.FaceDetectionWrapper;
 import com.lenss.yzeng.utils.FaceDetector;
 import com.lenss.yzeng.utils.Serializer;
+import com.lenss.yzeng.utils.Utils;
 import com.qualcomm.snapdragon.sdk.face.FaceData;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing.FP_MODES;
@@ -82,7 +83,6 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     private LocalSocket localClient;
     private ObjectOutputStream oos;
     private static final String LOCAL_ADDRESS = "com.android.greporter";
-    public static String localAddress;
     private static int dataLength;
     private int previewTimes = 0;
 
@@ -126,8 +126,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     private DrawView drawView;
     private final int FRONT_CAMERA_INDEX = 1;
     private final int BACK_CAMERA_INDEX = 0;
-    private int MY_PERMISSIONS_REQUEST_CAMERA = -1;
-    private int MY_PERMISSIONS_REQUEST_WIFI = -1;
+    private int MY_PERMISSIONS = -1;
 
     // boolean clicked = false;
     boolean fpFeatureSupported = false;
@@ -166,9 +165,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWifiPermissions();
-        WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
-        localAddress= Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        Utils.requestPermisssions(this, new String[]{Manifest.permission.CAMERA});
 
         setContentView(R.layout.activity_camera_preview);
         myView = new View(CameraPreviewActivity.this);
@@ -201,8 +198,6 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         cameraIndex = Camera.getNumberOfCameras() - 1;// Start with front Camera
 
-        requestCameraPermissions();
-
         try {
             cameraObj = Camera.open(cameraIndex); // attempt to get a Camera instance
         } catch (Exception e) {
@@ -232,26 +227,6 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         // yukun
         // start the stream thread to poll cqueue data and write to output stream
         new Thread(new StreamThreadLocal()).start();
-    }
-
-    // yukun
-
-    public void requestCameraPermissions(){
-        int permissionFlag = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (permissionFlag != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
-        }
-    }
-
-    public void requestWifiPermissions(){
-        int permissionFlag = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE);
-        if (permissionFlag != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE}, MY_PERMISSIONS_REQUEST_WIFI);
-        }
-    }
-
-    public static String getLocalAddress(){
-        return localAddress;
     }
     // yukun end
 

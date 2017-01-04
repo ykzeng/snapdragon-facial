@@ -4,15 +4,15 @@
         android:id="@+id/action_set_masterIP"
         android:title="@string/action_set_masterIP"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
     <item
         android:id="@+id/action_set_clusterId"
         android:title="@string/action_set_clusterId"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
     <item
         android:id="@+id/action_submit_topology"
         android:title="@string/action_submit_topology"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
 </menu>

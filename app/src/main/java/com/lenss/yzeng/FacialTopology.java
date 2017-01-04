@@ -1,6 +1,7 @@
 package com.lenss.yzeng;
 
 import com.lenss.qning.greporter.topology.Topology;
+import com.qualcomm.snapdragon.MainActivity;
 import com.qualcomm.snapdragon.sdk.sample.CameraPreviewActivity;
 
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ public class FacialTopology {
 
         // set each component of topology
         CamStreamDistributor csd = new CamStreamDistributor();
-        csd.setSourceIP(CameraPreviewActivity.getLocalAddress());
+        csd.setSourceIP(MainActivity.getLocalAddress());
         mTopology.setDistributor(csd, 1);
 
         FaceDetectionProcessor fd = new FaceDetectionProcessor();
-        fd.setSourceIP(CameraPreviewActivity.getLocalAddress());
+        fd.setSourceIP(MainActivity.getLocalAddress());
         mTopology.setProcessor(fd, 2, Topology.Local_First);
 
         // set the relationship between each component in the topology
