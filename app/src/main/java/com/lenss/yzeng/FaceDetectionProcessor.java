@@ -2,6 +2,7 @@ package com.lenss.yzeng;
 
 import android.util.Log;
 
+import com.google.gson.annotations.Expose;
 import com.lenss.qning.greporter.greporter.core.ComputingNode;
 import com.lenss.qning.greporter.topology.Processor;
 import com.lenss.yzeng.utils.FaceDetectionWrapper;
@@ -18,9 +19,16 @@ import java.util.ArrayList;
  */
 
 public class FaceDetectionProcessor extends Processor {
+    @Expose
     private static boolean isFaceObjExist = false;
+
+    @Expose
     private boolean fpFeatureSupported = false;
+
+    @Expose
     private FaceDetector faceDetector = null;
+
+    @Expose
     public final int confidence_value = 58;
     // the frame data length of a frame from onPreviewFrame()
     //public final int frameLength = 1474560;
@@ -46,10 +54,12 @@ public class FaceDetectionProcessor extends Processor {
         }
     }
 
+    @Override
     public void prepare(){
         setupFaceProc();
     }
 
+    @Override
     public void execute(){
         byte[] data = null;
         FaceDetector.FrameData frameData = null;
@@ -114,6 +124,11 @@ public class FaceDetectionProcessor extends Processor {
 //            setUI(numFaces, smileValue, leftEyeBlink, rightEyeBlink, faceRollValue, yaw, pitch, gazePointValue,
 //                    horizontalGaze, verticalGaze);
 //        }
+    }
+
+    @Override
+    public void postExecute(){
+        this.faceDetector.release();
     }
 
     private  byte[] getData(int taskID)

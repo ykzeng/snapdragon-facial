@@ -3,6 +3,7 @@ package com.lenss.yzeng;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 
+import com.google.gson.annotations.Expose;
 import com.lenss.qning.greporter.greporter.core.ComputingNode;
 import com.lenss.qning.greporter.topology.Distributor;
 import com.lenss.yzeng.utils.FaceDetector;
@@ -17,13 +18,18 @@ import java.io.ObjectInputStream;
 
 public class CamStreamDistributor extends Distributor {
     // variables inherited from MyDistributor
+    @Expose
     private static final int BUF_SIZE = 1024 * 1024;
+
+    @Expose
     private static final String LOCAL_ADDRESS = "com.android.greporter";
 
+    @Override
     public void prepare(){
         new Thread(new PullStreamThreadLocal()).start();
     }
 
+    @Override
     public void execute(){
         // whether we still needs to find GoP here?
         // TODO 1st, we ignore GoP and do one frame at a time
@@ -35,13 +41,9 @@ public class CamStreamDistributor extends Distributor {
         }
     }
 
-    public void postExecute(){
-
-    }
-
     // connect to com.android.greporter
     // retrieve data from it and distribute into ComputingNode
-    class PullStreamThreadLocal implements Runnable {
+    public class PullStreamThreadLocal implements Runnable {
         private LocalServerSocket serverSocket;
         private LocalSocket clientSocket;
         private ObjectInputStream ois;

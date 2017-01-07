@@ -23,6 +23,10 @@ public class FaceDetector {
         this.faceProc = faceProc;
     }
 
+    public void release(){
+        this.faceProc.release();
+    }
+
     public FaceDetectionWrapper detectFaces(byte[] data, int previewSizeWidth, int previewSizeHeight,
                                             FacialProcessing.PREVIEW_ROTATION_ANGLE angleEnum, boolean isMirrored,
                                             int surfaceWidth, int surfaceHeight) {

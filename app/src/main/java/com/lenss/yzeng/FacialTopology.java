@@ -21,7 +21,7 @@ public class FacialTopology {
 
         FaceDetectionProcessor fd = new FaceDetectionProcessor();
         fd.setSourceIP(MainActivity.getLocalAddress());
-        mTopology.setProcessor(fd, 2, Topology.Local_First);
+        mTopology.setProcessor(fd, 1, Topology.Local_First);
 
         // set the relationship between each component in the topology
         ArrayList<Object> downStreamComponents = new ArrayList<Object>();

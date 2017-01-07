@@ -44,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        Utils.requestPermisssions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE});
+        Utils.requestPermisssions(this, new String[]{Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.INTERNET});
 
         WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
         localAddress= Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
