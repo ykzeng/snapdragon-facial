@@ -2,6 +2,7 @@ package com.lenss.yzeng;
 
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
+import android.util.Pair;
 
 import com.google.gson.annotations.Expose;
 import com.lenss.qning.greporter.greporter.core.ComputingNode;
@@ -19,10 +20,10 @@ import java.io.ObjectInputStream;
 public class CamStreamDistributor extends Distributor {
     // variables inherited from MyDistributor
     @Expose
-    private static final int BUF_SIZE = 1024 * 1024;
+    private final int BUF_SIZE = 1024 * 1024;
 
     @Expose
-    private static final String LOCAL_ADDRESS = "com.android.greporter";
+    private final String LOCAL_ADDRESS = "com.android.greporter";
 
     @Override
     public void prepare(){
@@ -33,9 +34,9 @@ public class CamStreamDistributor extends Distributor {
     public void execute(){
         // whether we still needs to find GoP here?
         // TODO 1st, we ignore GoP and do one frame at a time
-        byte[] frameData = ComputingNode.retrieveIncomingQueue(getTaskID());
+        Pair<Long, byte[]> incomingQ = ComputingNode.retrieveIncomingQueue(getTaskID());
         try{
-            ComputingNode.emit(frameData, getTaskID(), FaceDetectionProcessor.class.getName());
+            ComputingNode.emit(incomingQ.first, incomingQ.second, getTaskID(), FaceDetectionProcessor.class.getName());
         } catch (InterruptedException e){
             e.printStackTrace();
         }

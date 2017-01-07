@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class FaceDetectionProcessor extends Processor {
     @Expose
-    private static boolean isFaceObjExist = false;
+    private boolean isFaceObjExist = false;
 
     @Expose
     private boolean fpFeatureSupported = false;
@@ -133,6 +133,6 @@ public class FaceDetectionProcessor extends Processor {
 
     private  byte[] getData(int taskID)
     {
-        return ComputingNode.retrieveIncomingQueue(taskID);
+        return ComputingNode.retrieveIncomingQueue(taskID).second;
     }
 }
