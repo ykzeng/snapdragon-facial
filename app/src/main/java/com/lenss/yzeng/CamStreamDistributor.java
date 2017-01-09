@@ -2,6 +2,7 @@ package com.lenss.yzeng;
 
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
+import android.util.Log;
 import android.util.Pair;
 
 import com.google.gson.annotations.Expose;
@@ -27,6 +28,8 @@ public class CamStreamDistributor extends Distributor {
 
     @Override
     public void prepare(){
+        //Log.e("Distributor.prepare", "entering the prepare function");
+        //Obviously we have entered here and started the thread for pulling stream from local address
         new Thread(new PullStreamThreadLocal()).start();
     }
 
@@ -34,11 +37,22 @@ public class CamStreamDistributor extends Distributor {
     public void execute(){
         // whether we still needs to find GoP here?
         // TODO 1st, we ignore GoP and do one frame at a time
-        Pair<Long, byte[]> incomingQ = ComputingNode.retrieveIncomingQueue(getTaskID());
-        try{
-            ComputingNode.emit(incomingQ.first, incomingQ.second, getTaskID(), FaceDetectionProcessor.class.getName());
-        } catch (InterruptedException e){
-            e.printStackTrace();
+        //Log.e("Distributor.execute", "Entering the execute function");
+        int count = 0;
+        while(!Thread.currentThread().isInterrupted()){
+            //Log.e("Distributor.execute", "Entering the while loop");
+            //we have confirmed that the program will go before the next sentence
+            Pair<Long, byte[]> incomingQ = ComputingNode.retrieveIncomingQueue(getTaskID());
+            if (incomingQ != null) {
+                //Log.e("Distributor.execute", "Data retrieved from incoming queue: " + "first-" + incomingQ.first);
+                try {
+                    ComputingNode.emit(incomingQ.first, incomingQ.second, getTaskID(), FaceDetectionProcessor.class.getName());
+                    Log.e("Distributor.execute", "Emitting the " + count + "th byte array!");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                count++;
+            }
         }
     }
 
@@ -51,6 +65,7 @@ public class CamStreamDistributor extends Distributor {
         private byte[] buf = new byte[BUF_SIZE];
 
         public void run() {
+            long inputFrameCount = 0;
             try {
                 serverSocket = new LocalServerSocket(LOCAL_ADDRESS);
                 System.out.println("************** LocalServerSocket established ****************");
@@ -69,7 +84,9 @@ public class CamStreamDistributor extends Distributor {
                 try {
                     FaceDetector.FrameData frameObject = (FaceDetector.FrameData)ois.readObject();
                     byte[] frameData = frameObject.getData();
+                    Log.e("Distributor.PullStream", "Collecting" + inputFrameCount + "th FrameData Obj");
                     ComputingNode.collect(getTaskID(), frameData);
+                    inputFrameCount ++;
                 } catch(IOException e) {
                     e.printStackTrace();
                 }catch (ClassNotFoundException e){
