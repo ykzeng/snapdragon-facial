@@ -37,7 +37,7 @@
         android:configChanges="orientation"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/Theme.AppCompat.Light" >
+        android:theme="@style/Theme.AppCompat.Light">
         <!--<activity-->
         <!--android:name="com.qualcomm.snapdragon.sdk.sample.CameraPreviewActivity"-->
         <!--android:label="@string/app_name" >-->

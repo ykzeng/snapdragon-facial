@@ -1,5 +1,6 @@
 package com.lenss.yzeng;
 
+import android.hardware.camera2.params.Face;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.util.Log;
@@ -9,6 +10,7 @@ import com.google.gson.annotations.Expose;
 import com.lenss.qning.greporter.greporter.core.ComputingNode;
 import com.lenss.qning.greporter.topology.Distributor;
 import com.lenss.yzeng.utils.FaceDetector;
+import com.lenss.yzeng.utils.Serializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,8 +85,12 @@ public class CamStreamDistributor extends Distributor {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     FaceDetector.FrameData frameObject = (FaceDetector.FrameData)ois.readObject();
-                    byte[] frameData = frameObject.getData();
-                    Log.e("Distributor.PullStream", "Collecting" + inputFrameCount + "th FrameData Obj");
+                    byte[] frameData = Serializer.serialize(frameObject);
+                    FaceDetector.FrameData tmpObject = (FaceDetector.FrameData)Serializer.deserialize(frameData);
+                    //byte[] frameData = frameObject.getData();
+                    Log.e("Distributor.PullStream", "Collecting" + inputFrameCount + "th FrameData Obj: " + frameObject.toString() + " with " + frameObject.getData().length + " bytes frame data");
+                    Log.e("Distributor.PullStream", "After serialization it contains " + frameData.length + " bytes");
+                    Log.e("Distributor.PullStream", "Then after deserialization it becomes " + tmpObject.toString() + " with " + tmpObject.getData().length + " bytes frame data");
                     ComputingNode.collect(getTaskID(), frameData);
                     inputFrameCount ++;
                 } catch(IOException e) {

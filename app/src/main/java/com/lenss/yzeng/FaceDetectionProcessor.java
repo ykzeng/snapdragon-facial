@@ -1,6 +1,7 @@
 package com.lenss.yzeng;
 
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.gson.annotations.Expose;
 import com.lenss.qning.greporter.greporter.core.ComputingNode;
@@ -63,18 +64,25 @@ public class FaceDetectionProcessor extends Processor {
     public void execute(){
         byte[] data = null;
         FaceDetector.FrameData frameData = null;
+        long count = 0;
         // we assume that getData will get one data passed by emit() at a time
         // which shall be one frame data in onPreviewFrame(), then we can do face detection using that data
         while (!Thread.interrupted()){
             data = getData(getTaskID());
-            try {
-                frameData = (FaceDetector.FrameData) Serializer.deserialize(data);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            if (data != null) {
+                Log.e("FaceDP.execute", count + "th frame data received!");
+                long receivedTime = System.currentTimeMillis();
+                try {
+                    frameData = (FaceDetector.FrameData) Serializer.deserialize(data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData);
+                Log.e("FaceDP.execute", count + "th frame data processed in " + (System.currentTimeMillis() - receivedTime) + " ms");
+                count ++;
             }
-            FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData);
         }
         // yukun: simplified version of the above commented code
 //        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
@@ -133,6 +141,15 @@ public class FaceDetectionProcessor extends Processor {
 
     private  byte[] getData(int taskID)
     {
-        return ComputingNode.retrieveIncomingQueue(taskID).second;
+        //Log.e("FaceDP.getData", "Doing retrieveIncomingQueue");
+        Pair<Long, byte[]> frameDataPair = ComputingNode.retrieveIncomingQueue(taskID);
+        if (frameDataPair != null) {
+            Log.e("FaceDP.getData", "Got non-null frameDataPair");
+            return frameDataPair.second;
+        }
+        else {
+            //Log.e("FaceDP.getData", "Got null frameDataPair");
+            return null;
+        }
     }
 }

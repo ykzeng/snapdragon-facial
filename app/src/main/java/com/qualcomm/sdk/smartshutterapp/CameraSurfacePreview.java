@@ -1,5 +1,5 @@
 /* ======================================================================
- *  Copyright © 2014 Qualcomm Technologies, Inc. All Rights Reserved.
+ *  Copyright cï¿½ 2014 Qualcomm Technologies, Inc. All Rights Reserved.
  *  QTI Proprietary and Confidential.
  *  =====================================================================
  *  

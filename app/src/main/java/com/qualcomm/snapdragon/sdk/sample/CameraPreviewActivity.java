@@ -85,6 +85,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     private static final String LOCAL_ADDRESS = "com.android.greporter";
     private static int dataLength;
     private int previewTimes = 0;
+    public static int count = 0;
 
     // write data into com.android.greporter
     public class StreamThreadLocal implements Runnable {
@@ -490,7 +491,6 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 //        }catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
         presentOrientation = (90 * Math.round(deviceOrientation / 90)) % 360;
         int dRotation = display.getRotation();
         PREVIEW_ROTATION_ANGLE angleEnum = PREVIEW_ROTATION_ANGLE.ROT_0;
@@ -554,8 +554,12 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         // wrap up the frame data needed for a face detection
         FaceDetector.FrameData frameData = new FaceDetector.FrameData(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
         // yukun
-        // from here, distribute the data to other devices and do face processing
-        cqueue.add(frameData);
+        // from here, distribute the data to other devices and do face
+        if (count < 1){
+            cqueue.add(frameData);
+            Log.e("Camera.preview", "adding " + count + "th frame to cqueue");
+            count ++;
+        }
 
         // from here the commented codes are original (unwrapped) for face detection
         FaceDetectionWrapper faceWrapper = faceDetector.detectFaces(frameData);
