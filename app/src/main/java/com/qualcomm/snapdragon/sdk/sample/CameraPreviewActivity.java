@@ -8,7 +8,10 @@
 
 package com.qualcomm.snapdragon.sdk.sample;
 
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -43,6 +46,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lenss.yzeng.utils.FaceDetector;
+import com.lenss.yzeng.utils.Utils;
 import com.qualcomm.snapdragon.sdk.face.FaceData;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing.FP_MODES;
@@ -98,6 +103,10 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     float rounded;
     Display display;
     int displayAngle;
+
+    //variables for capturing frame data statistics
+    private int frameStatisticCount = 0;
+    private Map<Integer, Integer> frameDataStatMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +169,8 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
 
         display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
+        // init statistics variables
+        frameDataStatMap = new HashMap<Integer, Integer>();
     }
 
     public void requestCameraPermissions(){
@@ -438,37 +449,66 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         surfaceWidth = mPreview.getWidth();
         surfaceHeight = mPreview.getHeight();
 
+        boolean isMirrored = false;
         // Landscape mode - front camera
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = true;
             landScapeMode = true;
         }
         // landscape mode - back camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = false;
             landScapeMode = true;
         }
         // Portrait mode - front camera
         else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 && !cameraSwitch) {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = true;
             landScapeMode = false;
         }
         // Portrait mode - back camera
         else {
-            faceProc.setFrame(data, previewSize.width, previewSize.height, false, angleEnum);
-            cameraObj.setDisplayOrientation(displayAngle);
+            isMirrored = false;
             landScapeMode = false;
         }
+        cameraObj.setDisplayOrientation(displayAngle);
+
+        // code section for getting frame data stat
+        // yukun
+        FaceDetector.FrameData frameData = new FaceDetector.FrameData(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
+        if (frameStatisticCount < 1000){
+            if (frameStatisticCount % 10 == 0){
+                Log.e("Cam.preview", "Progress: " + ((double)frameStatisticCount / 1000));
+            }
+            byte[] frameBytes;
+            try {
+                frameBytes = Utils.serialize(frameData);
+                Integer key = frameBytes.length;
+                Integer value = frameDataStatMap.get(key);
+                if (value != null){
+                    frameDataStatMap.put(key, (value++));
+                }
+                else {
+                    frameDataStatMap.put(key, 1);
+                    Log.e("Cam.preview", "Found different size in the " + frameStatisticCount + "th frame data obj, length in bytes: " + key);
+                }
+                frameStatisticCount ++;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (frameStatisticCount == 1000){
+            Log.e("Cam.preview", "Writing 1000 frames' data to stat file");
+            Utils.writeMapToFile(frameDataStatMap, "/storage/emulated/0/frame_data_stat");
+            frameStatisticCount ++;
+        }
+        // the end
 
         int numFaces = faceProc.getNumFaces();
 
         if (numFaces == 0) {
-            Log.d("TAG", "No Face Detected");
+            //Log.d("TAG", "No Face Detected");
             if (drawView != null) {
                 preview.removeView(drawView);
 
@@ -479,7 +519,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
             setUI(0, 0, 0, 0, 0, 0, 0, null, 0, 0);
         } else {
 
-            Log.d("TAG", "Face Detected");
+            //Log.d("TAG", "Face Detected");
             faceArray = faceProc.getFaceData(EnumSet.of(FacialProcessing.FP_DATA.FACE_RECT,
                     FacialProcessing.FP_DATA.FACE_COORDINATES, FacialProcessing.FP_DATA.FACE_CONTOUR,
                     FacialProcessing.FP_DATA.FACE_SMILE, FacialProcessing.FP_DATA.FACE_ORIENTATION,
