@@ -64,24 +64,39 @@ public class FaceDetectionProcessor extends Processor {
     public void execute(){
         byte[] data = null;
         FaceDetector.FrameData frameData = null;
+        ByteBuffer buffer = ByteBuffer.allocate(1474976);
         long count = 0;
         // we assume that getData will get one data passed by emit() at a time
         // which shall be one frame data in onPreviewFrame(), then we can do face detection using that data
         while (!Thread.interrupted()){
             data = getData(getTaskID());
             if (data != null) {
-                Log.e("FaceDP.execute", count + "th frame data received!");
-                long receivedTime = System.currentTimeMillis();
-                try {
-                    frameData = (FaceDetector.FrameData) Serializer.deserialize(data);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                int bufRem = buffer.remaining();
+                int length = data.length;
+                // if the buffer remains unfilled after putting new data
+                if (length < bufRem){
+                    buffer.put(data);
                 }
-                FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData);
-                Log.e("FaceDP.execute", count + "th frame data processed in " + (System.currentTimeMillis() - receivedTime) + " ms");
-                count ++;
+                // if the buffer happen to be full after putting new data
+                else{
+                    buffer.put(data, 0, bufRem);
+                    Log.e("FaceDP.execute", count + "th frame data received!");
+                    long receivedTime = System.currentTimeMillis();
+                    try {
+                        frameData = (FaceDetector.FrameData) Serializer.deserialize(buffer.array());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData);
+                    Log.e("FaceDP.execute", count + "th frame data processed in " + (System.currentTimeMillis() - receivedTime) + " ms");
+                    count ++;
+                    buffer.clear();
+                    if (length > bufRem){
+                        buffer.put(data, bufRem, length - bufRem);
+                    }
+                }
             }
         }
         // yukun: simplified version of the above commented code
@@ -144,7 +159,6 @@ public class FaceDetectionProcessor extends Processor {
         //Log.e("FaceDP.getData", "Doing retrieveIncomingQueue");
         Pair<Long, byte[]> frameDataPair = ComputingNode.retrieveIncomingQueue(taskID);
         if (frameDataPair != null) {
-            Log.e("FaceDP.getData", "Got non-null frameDataPair");
             return frameDataPair.second;
         }
         else {

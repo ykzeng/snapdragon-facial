@@ -555,7 +555,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         FaceDetector.FrameData frameData = new FaceDetector.FrameData(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
         // yukun
         // from here, distribute the data to other devices and do face
-        if (count < 1){
+        if (count < 100){
             cqueue.add(frameData);
             Log.e("Camera.preview", "adding " + count + "th frame to cqueue");
             count ++;
