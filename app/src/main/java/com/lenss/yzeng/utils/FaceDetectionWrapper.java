@@ -1,5 +1,7 @@
 package com.lenss.yzeng.utils;
 
+import android.util.Log;
+
 import com.qualcomm.snapdragon.sdk.face.FaceData;
 
 /**

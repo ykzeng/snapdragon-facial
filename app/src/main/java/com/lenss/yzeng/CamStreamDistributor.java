@@ -11,6 +11,7 @@ import com.lenss.qning.greporter.greporter.core.ComputingNode;
 import com.lenss.qning.greporter.topology.Distributor;
 import com.lenss.yzeng.utils.FaceDetector;
 import com.lenss.yzeng.utils.Serializer;
+import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,17 +29,51 @@ public class CamStreamDistributor extends Distributor {
     @Expose
     private final String LOCAL_ADDRESS = "com.android.greporter";
 
+    @Expose
+    private FaceDetector faceDetector = null;
+
+    @Expose
+    private boolean isFaceObjExist = false;
+
+    @Expose
+    private boolean fpFeatureSupported = false;
+
+    @Expose
+    private final int confidence_value = 58;
+
+    private void setupFaceProc(){
+        if (!isFaceObjExist) {
+            // Check to see if the FacialProc feature is supported in the device or no.
+            fpFeatureSupported = FacialProcessing
+                    .isFeatureSupported(FacialProcessing.FEATURE_LIST.FEATURE_FACIAL_PROCESSING);
+
+            // I think we don't have to check faceProc again here
+            if (fpFeatureSupported && faceDetector == null) {
+                Log.e("TAG", "Feature is supported");
+                FacialProcessing faceProc = FacialProcessing.getInstance();  // Calling the Facial Processing Constructor.
+                faceProc.setRecognitionConfidence(confidence_value);
+                // we might wanna change the mode to FP_MODE_STILL to increase computing demand
+                faceProc.setProcessingMode(FacialProcessing.FP_MODES.FP_MODE_VIDEO);
+                faceDetector = new FaceDetector(faceProc);
+            } else {
+                Log.e("TAG", "Feature is NOT supported");
+                return;
+            }
+        }
+    }
+
     @Override
     public void prepare(){
         //Log.e("Distributor.prepare", "entering the prepare function");
         //Obviously we have entered here and started the thread for pulling stream from local address
         new Thread(new PullStreamThreadLocal()).start();
+        setupFaceProc();
     }
 
     @Override
     public void execute(){
         // whether we still needs to find GoP here?
-        // TODO 1st, we ignore GoP and do one frame at a time
+        // 1st, we ignore GoP and do one frame at a time
         //Log.e("Distributor.execute", "Entering the execute function");
         int count = 0;
         while(!Thread.currentThread().isInterrupted()){
@@ -49,7 +84,7 @@ public class CamStreamDistributor extends Distributor {
                 //Log.e("Distributor.execute", "Data retrieved from incoming queue: " + "first-" + incomingQ.first);
                 try {
                     ComputingNode.emit(incomingQ.first, incomingQ.second, getTaskID(), FaceDetectionProcessor.class.getName());
-                    Log.e("Distributor.execute", "Emitting the " + count + "th byte array!");
+                    //Log.e("Distributor.execute", "Emitting the " + count + "th byte array!");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -64,7 +99,6 @@ public class CamStreamDistributor extends Distributor {
         private LocalServerSocket serverSocket;
         private LocalSocket clientSocket;
         private ObjectInputStream ois;
-        private byte[] buf = new byte[BUF_SIZE];
 
         public void run() {
             long inputFrameCount = 0;
@@ -84,15 +118,13 @@ public class CamStreamDistributor extends Distributor {
 
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    inputFrameCount ++;
                     FaceDetector.FrameData frameObject = (FaceDetector.FrameData)ois.readObject();
                     byte[] frameData = Serializer.serialize(frameObject);
-                    FaceDetector.FrameData tmpObject = (FaceDetector.FrameData)Serializer.deserialize(frameData);
-                    //byte[] frameData = frameObject.getData();
-                    Log.e("Distributor.PullStream", "Collecting" + inputFrameCount + "th FrameData Obj: " + frameObject.toString() + " with " + frameObject.getData().length + " bytes frame data");
-                    Log.e("Distributor.PullStream", "After serialization it contains " + frameData.length + " bytes");
-                    Log.e("Distributor.PullStream", "Then after deserialization it becomes " + tmpObject.toString() + " with " + tmpObject.getData().length + " bytes frame data");
                     ComputingNode.collect(getTaskID(), frameData);
-                    inputFrameCount ++;
+                    long timeBeforeDet = System.currentTimeMillis();
+                    faceDetector.detectFaces(frameObject, false);
+                    Log.e("Distributor.pull", "The " + inputFrameCount + "th frame is detected in " + (System.currentTimeMillis() - timeBeforeDet) + " ms");
                 } catch(IOException e) {
                     e.printStackTrace();
                 }catch (ClassNotFoundException e){

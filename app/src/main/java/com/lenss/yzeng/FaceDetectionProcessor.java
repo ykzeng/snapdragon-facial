@@ -9,6 +9,7 @@ import com.lenss.qning.greporter.topology.Processor;
 import com.lenss.yzeng.utils.FaceDetectionWrapper;
 import com.lenss.yzeng.utils.FaceDetector;
 import com.lenss.yzeng.utils.Serializer;
+import com.lenss.yzeng.utils.Utils;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 
 import java.io.IOException;
@@ -79,19 +80,22 @@ public class FaceDetectionProcessor extends Processor {
                 }
                 // if the buffer happen to be full after putting new data
                 else{
+                    count ++;
                     buffer.put(data, 0, bufRem);
                     Log.e("FaceDP.execute", count + "th frame data received!");
                     long receivedTime = System.currentTimeMillis();
                     try {
                         frameData = (FaceDetector.FrameData) Serializer.deserialize(buffer.array());
+                        //byteArrayList.add(buffer.array());
+                        //Utils.appendByteArrayListToFile(byteArrayList, "/storage/emulated/0/frame_data_byte");
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
-                    FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData);
-                    Log.e("FaceDP.execute", count + "th frame data processed in " + (System.currentTimeMillis() - receivedTime) + " ms");
-                    count ++;
+                    Log.e("FaceDP.execute", count + "th frame data deserialized in " + (System.currentTimeMillis() - receivedTime) + " ms");
+                    FaceDetectionWrapper fdw = faceDetector.detectFaces(frameData, false);
+                    Log.e("FaceDP.execute", count + "th frame data processed （deserialization and processing） in " + (System.currentTimeMillis() - receivedTime) + " ms");
                     buffer.clear();
                     if (length > bufRem){
                         buffer.put(data, bufRem, length - bufRem);

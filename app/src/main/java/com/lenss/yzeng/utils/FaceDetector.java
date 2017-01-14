@@ -15,7 +15,6 @@ import java.util.EnumSet;
  */
 
 public class FaceDetector {
-    // TODO how to init those variables
     private FacialProcessing faceProc;
     private String TAG = "yzeng.utils.FD";
 
@@ -48,7 +47,7 @@ public class FaceDetector {
         return new FaceDetectionWrapper(faceArray, numFaces);
     }
 
-    public FaceDetectionWrapper detectFaces(FrameData frameData) {
+    public FaceDetectionWrapper detectFaces(FrameData frameData, boolean doContour) {
         FaceData[] faceArray = null;
         byte[] data = frameData.getData();
         int previewSizeWidth = frameData.getPreviewSizeWidth(), previewSizeHeight = frameData.getPreviewSizeHeight();
@@ -62,10 +61,19 @@ public class FaceDetector {
 
         if (numFaces != 0){
             Log.d(TAG, "Face Detected");
-            faceArray = faceProc.getFaceData(EnumSet.of(FacialProcessing.FP_DATA.FACE_RECT,
-                    FacialProcessing.FP_DATA.FACE_COORDINATES, FacialProcessing.FP_DATA.FACE_CONTOUR,
-                    FacialProcessing.FP_DATA.FACE_SMILE, FacialProcessing.FP_DATA.FACE_ORIENTATION,
-                    FacialProcessing.FP_DATA.FACE_BLINK, FacialProcessing.FP_DATA.FACE_GAZE));
+            if (doContour){
+                faceArray = faceProc.getFaceData(EnumSet.of(FacialProcessing.FP_DATA.FACE_RECT,
+                        FacialProcessing.FP_DATA.FACE_COORDINATES, FacialProcessing.FP_DATA.FACE_CONTOUR,
+                        FacialProcessing.FP_DATA.FACE_SMILE, FacialProcessing.FP_DATA.FACE_ORIENTATION,
+                        FacialProcessing.FP_DATA.FACE_BLINK, FacialProcessing.FP_DATA.FACE_GAZE));
+            }
+            else{
+                faceArray = faceProc.getFaceData(EnumSet.of(FacialProcessing.FP_DATA.FACE_RECT,
+                        FacialProcessing.FP_DATA.FACE_COORDINATES,
+                        FacialProcessing.FP_DATA.FACE_SMILE, FacialProcessing.FP_DATA.FACE_ORIENTATION,
+                        FacialProcessing.FP_DATA.FACE_BLINK, FacialProcessing.FP_DATA.FACE_GAZE));
+            }
+            Log.d(TAG, "Face Array Acquired");
             faceProc.normalizeCoordinates(surfaceWidth, surfaceHeight);
         }
         return new FaceDetectionWrapper(faceArray, numFaces);

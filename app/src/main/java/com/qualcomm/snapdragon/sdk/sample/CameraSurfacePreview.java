@@ -1,6 +1,6 @@
 /*
  * ======================================================================
- * Copyright © 2014 Qualcomm Technologies, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2014 Qualcomm Technologies, Inc. All Rights Reserved.
  * QTI Proprietary and Confidential.
  * =====================================================================
  * @file: CameraSurfacePreview.java
@@ -78,7 +78,6 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         try {
             mCamera.setPreviewDisplay(holder);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         mCamera.startPreview();

@@ -69,6 +69,8 @@ import com.qualcomm.snapdragon.sdk.face.FacialProcessing;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing.FP_MODES;
 import com.qualcomm.snapdragon.sdk.face.FacialProcessing.PREVIEW_ROTATION_ANGLE;
 
+import org.apache.zookeeper.server.persistence.Util;
+
 @SuppressLint("NewApi")
 public class CameraPreviewActivity extends Activity implements Camera.PreviewCallback {
     // yukun
@@ -86,6 +88,9 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     private static int dataLength;
     private int previewTimes = 0;
     public static int count = 0;
+    // variables for storing frame data persistently
+    private ArrayList<byte[]> byteArrayList;
+    private final int confidence_value = 58;
 
     // write data into com.android.greporter
     public class StreamThreadLocal implements Runnable {
@@ -120,6 +125,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
     // yukun wrapper class for face detection
     FacialProcessing faceProc;
     FaceDetector faceDetector = null;
+
     View myView;
     Canvas canvas = new Canvas();
     Paint rectBrush = new Paint();
@@ -190,7 +196,8 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         if (fpFeatureSupported && faceProc == null) {
             Log.e("TAG", "Feature is supported");
             faceProc = FacialProcessing.getInstance();  // Calling the Facial Processing Constructor.
-            faceProc.setProcessingMode(FP_MODES.FP_MODE_VIDEO);
+            faceProc.setProcessingMode(FP_MODES.FP_MODE_STILL);
+            faceProc.setRecognitionConfidence(confidence_value);
             faceDetector = new FaceDetector(faceProc);
         } else {
             Log.e("TAG", "Feature is NOT supported");
@@ -228,6 +235,8 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         // yukun
         // start the stream thread to poll cqueue data and write to output stream
         new Thread(new StreamThreadLocal()).start();
+        // TODO comment out
+        byteArrayList = new ArrayList<byte[]>();
     }
     // yukun end
 
@@ -555,14 +564,26 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
         FaceDetector.FrameData frameData = new FaceDetector.FrameData(data, previewSize.width, previewSize.height, angleEnum, isMirrored, surfaceWidth, surfaceHeight);
         // yukun
         // from here, distribute the data to other devices and do face
-        if (count < 100){
+
+        count ++;
+
+        if (count < 10000){
             cqueue.add(frameData);
             Log.e("Camera.preview", "adding " + count + "th frame to cqueue");
-            count ++;
+//            try {
+//                byteArrayList.add(Serializer.serialize(frameData));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
+//        else if (count == 20){
+//            Utils.appendByteArrayListToFile(byteArrayList, "/storage/emulated/0/frame_data_bytes");
+//        }
 
         // from here the commented codes are original (unwrapped) for face detection
-        FaceDetectionWrapper faceWrapper = faceDetector.detectFaces(frameData);
+        long timeBeforeDetection = System.currentTimeMillis();
+        FaceDetectionWrapper faceWrapper = faceDetector.detectFaces(frameData, true);
+        Log.e("Camera.preview", count + "th frame detected in " + (System.currentTimeMillis() - timeBeforeDetection) + " ms");
 
         // draw faces on the screen
         int numFaces = faceWrapper.getNumFaces();
@@ -614,6 +635,7 @@ public class CameraPreviewActivity extends Activity implements Camera.PreviewCal
                         horizontalGaze, verticalGaze);
             }
         }
+        Log.e("Camera.preview", count + "th frame detected and shown in " + (System.currentTimeMillis() - timeBeforeDetection) + " ms");
     }
 
     // TODO get the face detection feedback from downstream components
